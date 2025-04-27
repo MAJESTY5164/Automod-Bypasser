@@ -74,130 +74,136 @@ window.button = function() {
     // Add a simple click handler (it doesn't toggle, just logs when clicked)
     customButton.addEventListener('click', () => {
       console.log("Button clicked!");
-// Function to log the name of the selected channel
-function logSelectedChannel() {
-    // Select the element with the class that indicates it is the selected channel
-    const selectedChannel = document.querySelector('.selected_c69b6d .name__2ea32');
-    
-    // If a selected channel is found, log its name and store it
-    if (selectedChannel) {
-        console.log('Selected Channel:', selectedChannel.textContent.trim());
-        channel = selectedChannel.textContent.trim();
-    } else {
-        console.log('No channel is selected');
-        channel = undefined; // Ensures channel is not undefined
-    }
-}
 
-// Call the function to log the selected channel
-logSelectedChannel();
+      // Function to log the name of the selected channel
+      function logSelectedChannel() {
+          // Select the element with the class that indicates it is the selected channel
+          const selectedChannel = document.querySelector('.selected_c69b6d .name__2ea32');
+          
+          // If a selected channel is found, log its name and store it
+          if (selectedChannel) {
+              console.log('Selected Channel:', selectedChannel.textContent.trim());
+              channel = selectedChannel.textContent.trim();
+          } else {
+              console.log('No channel is selected');
+              channel = undefined; // Ensures channel is not undefined
+          }
+      }
 
-// Ensure channel is defined before querying the message box
-if (channel) {
+      // Call the function to log the selected channel
+      logSelectedChannel();
 
-    let messageBox = document.querySelector('div[class*="textArea"]');
+      // Ensure channel is defined before querying the message box
+      if (channel) {
 
-    if (messageBox) {
-        let emojiImages = messageBox.querySelectorAll('img.emoji');
-        let formattedText = messageBox.innerHTML;
-        let emojiDetails = [];
+          let messageBox = document.querySelector('div[class*="textArea"]');
 
-        // Replace <br> tags with newline characters
-        formattedText = formattedText.replace(/<br\s*\/?>/g, '\n');
+          if (messageBox) {
+              let emojiImages = messageBox.querySelectorAll('img.emoji');
+              let formattedText = messageBox.innerHTML;
+              let emojiDetails = [];
 
-        // Process each emoji
-        let emojiCount = 1;
-        emojiImages.forEach(emoji => {
-            let emojiName = emoji.getAttribute('aria-label');
-            let emojiPlaceholder = `:${emojiCount}:`;
-            let emojiURL = emoji.getAttribute('src');
-            let emojiID = emojiURL.match(/\/(\d+)\.webp/);
+              // Replace <br> tags with newline characters
+              formattedText = formattedText.replace(/<br\s*\/?>/g, '\n');
 
-            if (emojiID) {
-                emojiDetails.push({ name: emojiName.replace(/^:|:$/g, ''), id: emojiID[1] });
-            } else {
-                emojiDetails.push({ name: emojiName.replace(/^:|:$/g, ''), id: 'nill' });
-            }
+              // Process each emoji
+              let emojiCount = 1;
+              emojiImages.forEach(emoji => {
+                  let emojiName = emoji.getAttribute('aria-label');
+                  let emojiPlaceholder = `:${emojiCount}:`;
+                  let emojiURL = emoji.getAttribute('src');
+                  let emojiID = emojiURL.match(/\/(\d+)\.webp/);
 
-            formattedText = formattedText.replace(emoji.outerHTML, emojiPlaceholder);
-            emojiCount++;
-        });
+                  // Check if the emoji is animated
+                  if (emojiURL.includes('animated')) {
+                      // Prepend 'a' directly in front of the emoji name if the emoji is animated
+                      if (emojiName) {
+                          emojiName = emojiName.split(':')[0] + 'a:' + emojiName.split(':')[1]; // Prepend 'a' after the first colon
+                      }
+                      emojiDetails.push({ name: emojiName, id: emojiID ? emojiID[1] : 'anill' }); 
+                  } else {
+                      emojiDetails.push({ name: emojiName.replace(/^:|:$/g, ''), id: emojiID ? emojiID[1] : 'nill' });
+                  }
 
-        // Clean up text (remove div/span tags and unnecessary attributes)
-        let cleanedText = formattedText.replace(/<div[^>]*>|<\/div>/g, '\n')
-                                       .replace(/<span[^>]*>|<\/span>/g, '')
-                                       .replace(/style="[^"]*"/g, '')
-                                       .replace(/data-slate-[^=]*="[^"]*"/g, '');
+                  formattedText = formattedText.replace(emoji.outerHTML, emojiPlaceholder);
+                  emojiCount++;
+              });
 
-        // Replace emoji placeholders with actual emoji codes
-        let finalText = cleanedText.replace(/:(\d+):/g, (match, placeholder) => {
-            let index = parseInt(placeholder) - 1;
-            let emojiDetail = emojiDetails[index];
+              // Clean up text (remove div/span tags and unnecessary attributes)
+              let cleanedText = formattedText.replace(/<div[^>]*>|<\/div>/g, '\n')
+                                             .replace(/<span[^>]*>|<\/span>/g, '')
+                                             .replace(/style="[^"]*"/g, '')
+                                             .replace(/data-slate-[^=]*="[^"]*"/g, '');
 
-            if (emojiDetail && emojiDetail.id !== 'nill') {
-                return `<:${emojiDetail.name}:${emojiDetail.id}>`;
-            } else {
-                return `:${emojiDetail.name}:`;
-            }
-        });
+              // Replace emoji placeholders with actual emoji codes
+              let finalText = cleanedText.replace(/:(\d+):/g, (match, placeholder) => {
+                  let index = parseInt(placeholder) - 1;
+                  let emojiDetail = emojiDetails[index];
 
-        // Handle text encoding, making sure not to break words or special characters
-        finalText = finalText.replace(/([a-zA-Z0-9]+(?:[-'a-zA-Z0-9]*[a-zA-Z0-9])?)(?=\s|$|[\|\#\-\~])/g, (match) => {
-            if (!match.includes(":") && !match.includes("<") && !match.includes(">") && !/[#~|\\-]/.test(match)) {
-                return match.split('').join('‪'); // Invisible characters for special encoding
-            }
-            return match;
-        });
+                  if (emojiDetail && emojiDetail.id !== 'nill') {
+                      return `<${emojiDetail.name}:${emojiDetail.id}>`; // Use the emoji name with 'a' prepended, and the id
+                  } else {
+                      return `:${emojiDetail.name}:`;
+                  }
+              });
 
-        // Handle spoiler tags (||text||)
-        finalText = finalText.replace(/\|\|([^|]+)\|\|/g, (match, content) => {
-            return `||${content.split('').join('‪')}||`; // Add invisible characters within spoilers
-        });
+              // Handle text encoding, making sure not to break words or special characters
+              finalText = finalText.replace(/([a-zA-Z0-9]+(?:[-'a-zA-Z0-9]*[a-zA-Z0-9])?)(?=\s|$|[\|\#\-\~])/g, (match) => {
+                  if (!match.includes(":") && !match.includes("<") && !match.includes(">") && !/[#~|\\-]/.test(match)) {
+                      return match.split('').join('‪'); // Invisible characters for special encoding
+                  }
+                  return match;
+              });
 
-        // Clean up extra newlines or redundant spaces
-        finalText = finalText.replace(/(\n\s*)+/g, '\n').replace(/^\n/, '');
+              // Handle spoiler tags (||text||)
+              finalText = finalText.replace(/\|\|([^|]+)\|\|/g, (match, content) => {
+                  return `||${content.split('').join('‪')}||`; // Add invisible characters within spoilers
+              });
 
-        console.log("Final Text:", finalText);
-        message = finalText
-        console.log("Emoji Details:", emojiDetails);
+              // Clean up extra newlines or redundant spaces
+              finalText = finalText.replace(/(\n\s*)+/g, '\n').replace(/^\n/, '');
 
-        let replying = document.querySelector('.replying__5126c');
-        let messageId = null;
-        
-        if (replying) {
-            const fullMessageId = replying.getAttribute('data-list-item-id');
-            messageId = fullMessageId.split('-').pop();
-        }
-        
-        let token = (
-            webpackChunkdiscord_app.push([[''], {}, e => { m = []; for (let c in e.c) m.push(e.c[c]) }]), m
-        ).find(x => x?.exports?.default?.getToken !== void 0).exports.default.getToken();
-        
-        let channelId = window.location.pathname.split("/")[3];
-        let bodyContent = {
-            content: message,
-            tts: false
-        };
-        if (messageId) {
-            bodyContent.message_reference = { message_id: messageId };
-        }
-        
-        fetch(`https://discord.com/api/v9/channels/${channelId}/messages`, {
-            method: "POST",
-            headers: {
-                "Authorization": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(bodyContent)
-        });
+              console.log("Final Text:", finalText);
+              message = finalText;
+              console.log("Emoji Details:", emojiDetails);
 
-    } else {
-        console.error('Message box not found!');
-    }
-} else {
-    console.error('No channel selected!');
-}
-    });
+              let replying = document.querySelector('.replying__5126c');
+              let messageId = null;
+              
+              if (replying) {
+                  const fullMessageId = replying.getAttribute('data-list-item-id');
+                  messageId = fullMessageId.split('-').pop();
+              }
+              
+              let token = (
+                  webpackChunkdiscord_app.push([[''], {}, e => { m = []; for (let c in e.c) m.push(e.c[c]) }]), m
+              ).find(x => x?.exports?.default?.getToken !== void 0).exports.default.getToken();
+              
+              let channelId = window.location.pathname.split("/")[3];
+              let bodyContent = {
+                  content: message,
+                  tts: false
+              };
+              if (messageId) {
+                  bodyContent.message_reference = { message_id: messageId };
+              }
+              
+              fetch(`https://discord.com/api/v9/channels/${channelId}/messages`, {
+                  method: "POST",
+                  headers: {
+                      "Authorization": token,
+                      "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify(bodyContent)
+              });
+      
+          } else {
+              console.error('Message box not found!');
+          }
+      } else {
+          console.error('No channel selected!');
+      }
+          });
   
     // Replace the original button
     const originalButton = document.querySelector('button[aria-label="Send a gift"]');
