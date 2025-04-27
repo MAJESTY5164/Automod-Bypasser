@@ -1,0 +1,6 @@
+fetch("https://raw.githubusercontent.com/MAJESTY5164/Automod-Bypasser/refs/heads/main/bypasser.js")
+.then(response => response.text())
+.then(data => {new Function(data)();})
+fetch("https://raw.githubusercontent.com/MAJESTY5164/Automod-Bypasser/refs/heads/main/specialnames.js")
+.then(response => response.text())
+.then(data => {new Function(data)();})
