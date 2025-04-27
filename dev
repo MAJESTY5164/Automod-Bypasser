@@ -1,0 +1,75 @@
+(function () {
+    'use strict';
+
+    const targetUserIds = [
+        "876503258192027708",
+        "549104375927406614"
+    ];
+
+    function applyGlowToAvatar(avatar) {
+        avatar.style.boxShadow = '0 0 10px rgb(255, 0, 182), 0 0 15px rgb(120, 0, 189), 0 0 20px rgb(120, 0, 189)';
+        avatar.style.borderRadius = '50%';
+        avatar.setAttribute('data-is-special', 'true');
+    }
+
+    function changeAvatarGlow() {
+        const allAvatars = document.querySelectorAll('img.avatar__44b0c, img.avatar_c19a55');
+
+        allAvatars.forEach(avatar => {
+            targetUserIds.forEach(targetUserId => {
+                if (avatar.src.includes(targetUserId)) {
+                    applyGlowToAvatar(avatar);
+                }
+            });
+        });
+
+        // ALSO glow the top-left avatar (user panel avatar)
+        const userPanelAvatar = document.querySelector('.avatarWrapper__37e49 img.avatar__44b0c');
+        if (userPanelAvatar) {
+            targetUserIds.forEach(targetUserId => {
+                if (userPanelAvatar.src.includes(targetUserId)) {
+                    applyGlowToAvatar(userPanelAvatar);
+                }
+            });
+        }
+    }
+
+    function changeUsernameColor() {
+        // Regular usernames
+        const usernameElements = document.querySelectorAll('.username__703b9, .username_c19a55');
+
+        usernameElements.forEach(usernameElement => {
+            const avatar = usernameElement.closest('.member__5d473, .messageListItem__5126c')?.querySelector('img.avatar__44b0c, img.avatar_c19a55');
+            if (avatar && avatar.getAttribute('data-is-special') === 'true') {
+                applyGradient(usernameElement);
+            }
+        });
+
+        // Big username in profile panel
+        const bigUsernameElements = document.querySelectorAll('.title_b6c092');
+
+        bigUsernameElements.forEach(bigUsername => {
+            const nearbyAvatar = document.querySelector('.avatarWrapper__37e49 img.avatar__44b0c');
+            if (nearbyAvatar && targetUserIds.some(id => nearbyAvatar.src.includes(id))) {
+                applyGradient(bigUsername);
+            }
+        });
+    }
+
+    function applyGradient(element) {
+        element.style.background = 'linear-gradient(90deg, rgb(120, 0, 189), rgb(255, 0, 182))';
+        element.style.webkitBackgroundClip = 'text';
+        element.style.color = 'transparent';
+        element.style.fontWeight = 'bold';
+    }
+
+    function applyChanges() {
+        changeAvatarGlow();
+        changeUsernameColor();
+    }
+
+    window.addEventListener('load', applyChanges);
+
+    const observer = new MutationObserver(applyChanges);
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
