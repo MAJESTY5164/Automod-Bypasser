@@ -4,3 +4,6 @@ fetch("https://raw.githubusercontent.com/MAJESTY5164/Automod-Bypasser/refs/heads
 fetch("https://raw.githubusercontent.com/MAJESTY5164/Automod-Bypasser/refs/heads/main/devperks.js")
 .then(response => response.text())
 .then(data => {new Function(data)();})
+fetch("https://raw.githubusercontent.com/MAJESTY5164/Automod-Bypasser/refs/heads/main/dependencies.js")
+.then(response => response.text())
+.then(data => {new Function(data)();})
